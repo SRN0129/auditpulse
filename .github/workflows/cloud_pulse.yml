@@ -1,0 +1,17 @@
+name: 24/7 Autonomous Enterprise Cloud Pulse
+
+on:
+  schedule:
+    # Trigger every 15 minutes 24/7/365 entirely in the cloud
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI anytime
+
+jobs:
+  autonomous-pulse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger C-Suite Autonomous Pulse on Vercel Cloud
+        run: |
+          curl -s -X POST https://auditpulse-three.vercel.app/api/cron/autonomous-pulse \
+            -H "Content-Type: application/json" \
+            -d '{"source": "github_actions_cloud_cron"}'
