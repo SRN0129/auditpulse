@@ -237,6 +237,22 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     reviewed_at DATETIME
   );
+
+  -- Autonomous Self-Audit & Self-Improvement Engine History
+  CREATE TABLE IF NOT EXISTS self_audit_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    target_url TEXT NOT NULL,
+    overall_score INTEGER NOT NULL,
+    speed_score INTEGER NOT NULL,
+    copy_score INTEGER NOT NULL,
+    mobile_score INTEGER NOT NULL,
+    trust_score INTEGER NOT NULL,
+    security_score INTEGER NOT NULL,
+    leaks_found_count INTEGER NOT NULL,
+    improvements_applied TEXT NOT NULL,
+    snapshot_json TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // Safe migrations for customers table
@@ -301,6 +317,12 @@ upsertAgent.run(
   'CUSTOMER SUPPORT AGENT',
   'Head of Instant Live Chat & Client Success',
   'SOLE MANDATE: Assist store visitors and customers 24/7 with instant, intelligent answers to inquiries regarding website diagnostics, 50-point report deliverables, pricing (₹299), zero-fee UPI checkout, and turnaround time to maximize buyer conversions and retention.'
+);
+upsertAgent.run(
+  'self_audit',
+  'SELF-HEALING CRO AGENT',
+  'Chief Storefront Auditor & Self-Optimization Lead',
+  'SOLE MANDATE: Continuously audit AuditPulse\'s own public website using deep DOM and performance heuristics. Identify friction, Cumulative Layout Shift (CLS), copy clarity issues, and security headers, and autonomously deploy iterative optimizations to maximize visitor-to-paid conversion.'
 );
 
 // Seed Initial Expansion Ventures if empty

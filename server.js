@@ -18,6 +18,7 @@ const emailDispatcher = require('./email_dispatcher');
 const socialAutopilot = require('./social_autopilot');
 const expansionAgent = require('./expansion_agent');
 const supportAgent = require('./support_agent');
+const selfAuditAgent = require('./self_audit_agent');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -517,7 +518,8 @@ app.get('/api/system/status', (req, res) => {
       socialPosts,
       ventures,
       requisitions,
-      customersCount
+      customersCount,
+      selfAudit: selfAuditAgent.getLatestStatus()
     });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -773,6 +775,31 @@ app.post('/api/support/chat', async (req, res) => {
     const { message, query, customerEmail, currentUrl } = req.body;
     const userQuery = message || query || '';
     const result = await supportAgent.handleQuery({ message: userQuery, customerEmail, currentUrl });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 18. Self-Healing CRO Agent Endpoints
+app.get('/api/self-audit/status', (req, res) => {
+  try {
+    const latest = selfAuditAgent.getLatestStatus();
+    const history = selfAuditAgent.getHistory(5);
+    res.json({
+      success: true,
+      latest,
+      history
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/self-audit/trigger', async (req, res) => {
+  try {
+    const targetUrl = req.body?.targetUrl || null;
+    const result = await selfAuditAgent.runSelfAudit(targetUrl);
     res.json(result);
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

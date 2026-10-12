@@ -20,6 +20,7 @@ const agentOrchestrator = require('./agent_orchestrator');
 const emailDispatcher = require('./email_dispatcher');
 const socialAutopilot = require('./social_autopilot');
 const expansionAgent = require('./expansion_agent');
+const selfAuditAgent = require('./self_audit_agent');
 
 class AutonomousEngine {
   constructor() {
@@ -92,7 +93,10 @@ class AutonomousEngine {
       // 9. Autonomous Business Expansion Agent (Venture Pipeline & Capital Requisitions)
       cycleLog.results.expansion = await expansionAgent.evaluateOpportunities();
 
-      // 10. Specialized Subagents (e.g. Viral Content Strategist)
+      // 10. Self-Healing CRO Agent: Autonomous Storefront Deep Audit & Optimization
+      cycleLog.results.self_audit = await selfAuditAgent.runSelfAudit();
+
+      // 11. Specialized Subagents (e.g. Viral Content Strategist)
       cycleLog.results.subagents = this.runSubagentRoutines();
 
       logAgentAction(

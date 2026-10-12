@@ -138,11 +138,74 @@
           <span>🤖</span>
           <span>C-Suite Autonomous Agent Orchestra & Governance</span>
         </h3>
-        <span class="text-xs text-cyan-400 font-semibold mono">6 Active Strategic Agents</span>
+        <span id="agentCountDisplay" class="text-xs text-cyan-400 font-semibold mono">10 Active Autonomous Agents</span>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="agentsGrid">
         <!-- Dynamically injected agents -->
+      </div>
+    </div>
+
+    <!-- 2B. SELF-HEALING CRO & STOREFRONT AUDITOR AGENT -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-xl">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xl">🩺</span>
+            <h4 class="text-lg font-black text-white">Self-Healing CRO Agent: Live Storefront Audit</h4>
+            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold px-2 py-0.5 rounded-full mono">AUTONOMOUS FEEDBACK LOOP</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">
+            Continuously audits AuditPulse's own production storefront (<strong class="text-cyan-400">auditpulse-three.vercel.app</strong>), detects Core Web Vitals CLS/speed leaks, and automatically stages high-converting variants.
+          </p>
+        </div>
+        <button id="triggerSelfAuditBtn" onclick="triggerManualSelfAudit()" class="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-400 hover:to-cyan-500 text-slate-950 text-xs font-black px-4 py-2.5 rounded-xl transition shadow-lg flex items-center space-x-2">
+          <span>⚡</span>
+          <span>Audit Own Storefront Now</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6" id="selfAuditScoresRow">
+        <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-center">
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">Health Score</span>
+          <span id="saOverallScore" class="text-2xl font-black text-emerald-400 mono">--</span>
+          <span class="text-[9px] text-slate-500 block mt-0.5">/ 100</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-center">
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">Speed</span>
+          <span id="saSpeedScore" class="text-2xl font-black text-cyan-400 mono">--</span>
+          <span class="text-[9px] text-slate-500 block mt-0.5">TTFB & Latency</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-center">
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">Copywriting</span>
+          <span id="saCopyScore" class="text-2xl font-black text-purple-400 mono">--</span>
+          <span class="text-[9px] text-slate-500 block mt-0.5">Hook & CTA</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-center">
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">Mobile UX</span>
+          <span id="saMobileScore" class="text-2xl font-black text-blue-400 mono">--</span>
+          <span class="text-[9px] text-slate-500 block mt-0.5">Responsive</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-center">
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">Trust Signals</span>
+          <span id="saTrustScore" class="text-2xl font-black text-amber-400 mono">--</span>
+          <span class="text-[9px] text-slate-500 block mt-0.5">Guarantees</span>
+        </div>
+        <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-center">
+          <span class="text-[10px] text-slate-400 font-bold uppercase block">Security</span>
+          <span id="saSecScore" class="text-2xl font-black text-emerald-400 mono">--</span>
+          <span class="text-[9px] text-slate-500 block mt-0.5">SSL & Headers</span>
+        </div>
+      </div>
+
+      <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl">
+        <div class="flex items-center justify-between text-xs mb-2">
+          <span class="font-bold text-slate-300">Latest Autonomous Optimizations Deployed:</span>
+          <span id="saTimestamp" class="text-slate-500 font-mono text-[11px]">Last audit: Pending</span>
+        </div>
+        <div id="saImprovementsList" class="text-xs text-slate-400 space-y-1 font-mono">
+          <div class="text-slate-500">Autonomous self-audit pending...</div>
+        </div>
       </div>
     </div>
 
@@ -683,6 +746,9 @@
         if (document.getElementById('ownerSurplus')) document.getElementById('ownerSurplus').innerText = surplus.toLocaleString('en-IN');
 
         // 3. Render C-Suite Agents
+        if (document.getElementById('agentCountDisplay') && data.agents) {
+          document.getElementById('agentCountDisplay').innerText = `${data.agents.length} Active Autonomous Agents`;
+        }
         const agentsBox = document.getElementById('agentsGrid');
         agentsBox.innerHTML = '';
         data.agents.forEach((ag) => {
@@ -694,6 +760,8 @@
           else if (ag.id === 'agent_manager') cadence = 'COO system check (3 mins)';
           else if (ag.id === 'marketing') cadence = 'Cold pitch loop (3 mins)';
           else if (ag.id === 'expansion') cadence = 'Venture analysis & Requisitions (3 mins)';
+          else if (ag.id === 'self_audit') cadence = 'Storefront deep audit & self-healing (3 mins)';
+          else if (ag.id === 'support') cadence = '24/7 instant client support';
 
           agentsBox.innerHTML += `
             <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl relative hover:border-cyan-500/40 transition">
@@ -718,6 +786,24 @@
             </div>
           `;
         });
+
+        // 3A. Render Self-Healing CRO Telemetry
+        if (data.selfAudit) {
+          const sa = data.selfAudit;
+          if (document.getElementById('saOverallScore')) document.getElementById('saOverallScore').innerText = sa.overall_score || '--';
+          if (document.getElementById('saSpeedScore')) document.getElementById('saSpeedScore').innerText = sa.speed_score || '--';
+          if (document.getElementById('saCopyScore')) document.getElementById('saCopyScore').innerText = sa.copy_score || '--';
+          if (document.getElementById('saMobileScore')) document.getElementById('saMobileScore').innerText = sa.mobile_score || '--';
+          if (document.getElementById('saTrustScore')) document.getElementById('saTrustScore').innerText = sa.trust_score || '--';
+          if (document.getElementById('saSecScore')) document.getElementById('saSecScore').innerText = sa.security_score || '--';
+          if (document.getElementById('saTimestamp')) document.getElementById('saTimestamp').innerText = `Audited: ${sa.created_at || 'Recently'}`;
+
+          const impBox = document.getElementById('saImprovementsList');
+          if (impBox && sa.improvements_applied) {
+            const imps = sa.improvements_applied.split(' | ');
+            impBox.innerHTML = imps.map(imp => `<div class="flex items-start space-x-2 text-emerald-400"><span class="text-xs">✓</span><span>${imp}</span></div>`).join('');
+          }
+        }
 
         // 3B. Render Expansion Portfolio Ventures
         const vBox = document.getElementById('dashboardVenturesGrid');
@@ -1099,6 +1185,32 @@
     window.copyToClipboard = function(text) {
       navigator.clipboard.writeText(text);
       alert('Copied to clipboard!');
+    };
+
+    // Trigger Self-Audit of Own Storefront
+    window.triggerManualSelfAudit = async function() {
+      const btn = document.getElementById('triggerSelfAuditBtn');
+      const origText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span><span>Auditing Storefront...</span>';
+      try {
+        const res = await fetch('/api/self-audit/trigger', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const d = await res.json();
+        if (d.success) {
+          alert(`🩺 Self-Audit Complete!\n- Health Score: ${d.scores.overall}/100\n- Speed Score: ${d.scores.speed}/100\n- Copy Score: ${d.scores.copywriting}/100\n- Improvements Applied: ${d.improvementsApplied.length}\n- Red Flags: ${d.redFlagsCount}`);
+          fetchDashboardData();
+        } else {
+          alert('Self-Audit failed: ' + d.error);
+        }
+      } catch (err) {
+        alert('Self-Audit network error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
     };
 
     // Trigger Full Autonomous Pulse Sweep
