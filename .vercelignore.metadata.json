@@ -1,0 +1,4 @@
+{
+  "summary":  "Create .vercelignore to exclude node_modules and browser profiles from deployment upload",
+  "updatedAt":  "2026-10-03T19:00:03.434088700Z"
+}

@@ -1,0 +1,4 @@
+{
+  "summary":  "Automated Chrome browser test script using puppeteer-core and isolated profile to simulate end-to-end user journey, checkout, fulfillment, and command dashboard with screenshots.",
+  "updatedAt":  "2026-10-03T14:34:13.783807200Z"
+}

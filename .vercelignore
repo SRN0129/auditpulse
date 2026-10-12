@@ -1,0 +1,5 @@
+node_modules
+isolated_chrome_profile
+isolated_chrome_profile_v2
+*.log
+*.png

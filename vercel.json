@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "crons": [
+    {
+      "path": "/api/cron/autonomous-pulse",
+      "schedule": "0 0 * * *"
+    }
+  ],
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/dashboard", "destination": "/api/index.js" },
+    { "source": "/report/(.*)", "destination": "/api/index.js" },
+    { "source": "/wallet", "destination": "/api/index.js" }
+  ]
+}

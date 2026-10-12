@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Owner Secure Digital Wallet — Autonomous Enterprise OS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-black">
+
+  <!-- AUTHENTICATION / LOCK OVERLAY (Visible until PIN verified) -->
+  <div id="lockOverlay" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-3xl mx-auto mb-4">
+        🔒
+      </div>
+      <h2 class="text-xl font-black text-center text-white">Owner Digital Wallet</h2>
+      <p class="text-xs text-slate-400 text-center mt-1">
+        Access is restricted strictly to the human business owner. Enter your security PIN to unlock financial controls.
+      </p>
+
+      <form id="authForm" class="mt-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1 text-center">Owner Security Passkey / PIN</label>
+          <input 
+            type="password" 
+            id="authPinInput" 
+            maxlength="10" 
+            required 
+            placeholder="••••" 
+            autocomplete="off"
+            class="w-full text-center tracking-[0.5em] text-2xl font-black px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-emerald-400 focus:border-emerald-500 focus:outline-none"
+          />
+          <span class="block text-[11px] text-slate-500 text-center mt-2 mono">
+            Default Master Key: <strong class="text-emerald-400">7799</strong> (changeable inside)
+          </span>
+        </div>
+
+        <div id="authErrorMsg" class="hidden text-xs text-rose-400 text-center font-semibold bg-rose-500/10 border border-rose-500/20 py-2 rounded-lg">
+          Invalid security PIN. Access denied.
+        </div>
+
+        <button 
+          type="submit" 
+          id="unlockBtn" 
+          class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black py-3 rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2"
+        >
+          <span>Unlock Digital Wallet</span>
+          <span>🔓</span>
+        </button>
+      </form>
+
+      <div class="mt-6 text-center">
+        <a href="/dashboard" class="text-xs text-slate-500 hover:text-slate-300 transition">
+          ← Return to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN UNLOCKED WALLET INTERFACE -->
+  <div id="walletContent" class="hidden min-h-screen flex flex-col">
+    
+    <!-- Top Bar -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <img src="/logo.svg" alt="AuditPulse" class="w-8 h-8 rounded-xl shadow-md" />
+          <div>
+            <span class="font-extrabold text-base tracking-tight text-white">AuditPulse <span class="text-emerald-400">Digital Wallet</span></span>
+            <span class="text-[10px] text-slate-400 block mono">Owner Exclusive Authority • soumyaranjannanda82@gmail.com</span>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+          <a href="/dashboard" class="text-xs text-slate-300 hover:text-white bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg transition flex items-center space-x-1.5">
+            <span>📊</span>
+            <span>Dashboard</span>
+          </a>
+          <button id="lockWalletBtn" class="text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
+            <span>🔒</span>
+            <span>Lock</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8 flex-1 w-full">
+
+      <!-- 1. MASTER BALANCE OVERVIEW -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Primary Available Withdrawal Card -->
+        <div class="bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-900 border-2 border-emerald-500/40 p-6 rounded-3xl shadow-xl relative overflow-hidden md:col-span-2">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center space-x-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Available for Instant Withdrawal</span>
+            </span>
+            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-mono font-bold">
+              30% Owner Surplus
+            </span>
+          </div>
+          <div class="flex items-baseline space-x-2 my-2">
+            <span class="text-2xl font-black text-emerald-400">₹</span>
+            <span id="availableSurplusText" class="text-4xl md:text-5xl font-black text-white mono">0</span>
+          </div>
+          <p class="text-xs text-slate-400">
+            Unencumbered profits ready for instant payout to your personal bank account or UPI ID.
+          </p>
+          <div class="mt-4 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500 mono">
+            <span>Total Earned: ₹<strong id="totalEarnedSurplus" class="text-slate-300">0</strong></span>
+            <span>Total Withdrawn: ₹<strong id="totalWithdrawnText" class="text-slate-300">0</strong></span>
+          </div>
+        </div>
+
+        <!-- Operating Reserve (40%) -->
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-400">Operating Reserve</span>
+              <span class="text-[9px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-2 py-0.5 rounded font-mono font-bold">40% Locked</span>
+            </div>
+            <div class="flex items-baseline space-x-1 my-1">
+              <span class="text-sm font-bold text-slate-400">₹</span>
+              <span id="opsReserveText" class="text-3xl font-black text-cyan-400 mono">0</span>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-2">
+            Guarantees enterprise longevity and zero operational downtime.
+          </p>
+        </div>
+
+        <!-- Growth Wallet (30%) -->
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-400">Growth Wallet</span>
+              <span class="text-[9px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded font-mono font-bold">30% Reserved</span>
+            </div>
+            <div class="flex items-baseline space-x-1 my-1">
+              <span class="text-sm font-bold text-slate-400">₹</span>
+              <span id="growthBudgetText" class="text-3xl font-black text-purple-400 mono">0</span>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-2">
+            Earmarked for Service #2 expansion (LeadGenie engine).
+          </p>
+        </div>
+
+      </div>
+
+      <!-- 2. ON-DEMAND WITHDRAWAL TERMINAL & RECEIVING UPI MANAGER -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- Withdrawal Execution Console -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-2.5 mb-1">
+              <span class="text-xl">💸</span>
+              <h3 class="text-lg font-black text-white">Instant On-Demand Withdrawal</h3>
+            </div>
+            <p class="text-xs text-slate-400 mb-6">
+              Disburse money from your Owner Surplus directly to your personal bank account or UPI ID. Zero transaction fee, zero delays.
+            </p>
+
+            <form id="withdrawalForm" class="space-y-4">
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="text-xs font-semibold text-slate-300">Withdrawal Amount (₹)</label>
+                  <button type="button" id="withdrawMaxBtn" class="text-[11px] text-emerald-400 font-bold hover:underline mono">
+                    Withdraw Max (₹<span id="maxBtnAmount">0</span>)
+                  </button>
+                </div>
+                <div class="relative">
+                  <span class="absolute left-3.5 top-3 text-slate-500 font-bold">₹</span>
+                  <input 
+                    type="number" 
+                    id="withdrawAmountInput" 
+                    required 
+                    min="1" 
+                    placeholder="Enter amount" 
+                    class="w-full pl-8 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-sm mono font-bold focus:border-emerald-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Destination UPI ID / Bank VPA</label>
+                <input 
+                  type="text" 
+                  id="withdrawVpaInput" 
+                  required 
+                  placeholder="e.g. yourname@oksbi" 
+                  class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs mono focus:border-emerald-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Owner Security PIN (Authorization)</label>
+                <input 
+                  type="password" 
+                  id="withdrawPinConfirm" 
+                  required 
+                  placeholder="••••" 
+                  maxlength="10"
+                  class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-emerald-400 text-xs mono font-bold focus:border-emerald-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Payout Note (Optional)</label>
+                <input 
+                  type="text" 
+                  id="withdrawNoteInput" 
+                  placeholder="e.g. Weekly Profit Draw" 
+                  class="w-full px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-emerald-500 focus:outline-none"
+                />
+              </div>
+
+              <div id="withdrawFeedback" class="hidden text-xs py-2 px-3 rounded-xl font-semibold"></div>
+
+              <button 
+                type="submit" 
+                id="executeWithdrawBtn" 
+                class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black py-3 rounded-xl text-xs transition shadow-lg flex items-center justify-center space-x-2"
+              >
+                <span>Authorize & Withdraw Funds</span>
+                <span>⚡</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-800 text-[11px] text-slate-500 flex items-center space-x-2">
+            <span>🛡️</span>
+            <span>Protected by salted SHA-256 Owner Passkey authorization.</span>
+          </div>
+        </div>
+
+        <!-- Receiving Payment Configuration -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-xl flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-2.5 mb-1">
+              <span class="text-xl">💳</span>
+              <h3 class="text-lg font-black text-white">Live Customer Receiving Destination</h3>
+            </div>
+            <p class="text-xs text-slate-400 mb-6">
+              All client payments made on the website checkout QR code route directly to this address with 0% gateway commission.
+            </p>
+
+            <form id="settingsForm" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Active Receiving UPI VPA</label>
+                <input 
+                  type="text" 
+                  id="cfgReceivingVpa" 
+                  required 
+                  placeholder="e.g. auditpulse.pay@upi" 
+                  class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-cyan-400 text-xs mono font-bold focus:border-cyan-400 focus:outline-none"
+                />
+                <span class="text-[10px] text-slate-500 block mt-1">Change this to your personal UPI ID anytime.</span>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Merchant / Beneficiary Display Name</label>
+                <input 
+                  type="text" 
+                  id="cfgReceivingName" 
+                  required 
+                  placeholder="e.g. AuditPulse Digital Services" 
+                  class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-cyan-400 focus:outline-none"
+                />
+              </div>
+
+              <div class="pt-2 border-t border-slate-800">
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Change Owner Security PIN (Optional)</label>
+                <input 
+                  type="password" 
+                  id="cfgNewPin" 
+                  placeholder="Leave blank to keep current PIN" 
+                  maxlength="10"
+                  class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs mono focus:border-cyan-400 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Current PIN (Required to save changes)</label>
+                <input 
+                  type="password" 
+                  id="cfgCurrentPin" 
+                  required 
+                  placeholder="••••" 
+                  maxlength="10"
+                  class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-emerald-400 text-xs mono font-bold focus:border-cyan-400 focus:outline-none"
+                />
+              </div>
+
+              <div id="settingsFeedback" class="hidden text-xs py-2 px-3 rounded-xl font-semibold"></div>
+
+              <button 
+                type="submit" 
+                id="saveSettingsBtn" 
+                class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-2"
+              >
+                <span>Save Wallet Credentials</span>
+                <span>💾</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-800 text-[11px] text-slate-500 flex items-center space-x-2">
+            <span>ℹ️</span>
+            <span>Changes take effect immediately on all storefront QR codes.</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 2B. AUTONOMOUS BUSINESS EXPANSION & CAPITAL REQUISITION CONSOLE -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-xl space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xl">🚀</span>
+              <h3 class="text-lg font-black text-white">Autonomous Business Expansion & Capital Requisitions</h3>
+              <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold px-2 py-0.5 rounded-full mono">OWNER GATE</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">
+              New business verticals discovered by the Autonomous Expansion Agent. All ventures route revenue to your same receiving UPI ID (<strong class="text-teal-400 mono">7735818294@slc</strong>). Expansion capital requires your explicit approval.
+            </p>
+          </div>
+          <button id="requestExpansionPulseBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3 py-2 rounded-xl transition flex items-center space-x-1.5 border border-slate-700">
+            <span>⚡</span>
+            <span>Trigger Expansion Sweep</span>
+          </button>
+        </div>
+
+        <!-- Registered Ventures Grid -->
+        <div>
+          <span class="text-[10px] uppercase font-bold text-slate-500 block mb-2">Active Expansion Portfolio & Ventures</span>
+          <div id="walletVenturesGrid" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Pending Capital Requisitions with 1-Click Approval -->
+        <div class="pt-4 border-t border-slate-800">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-white uppercase tracking-wider flex items-center space-x-2">
+              <span>Capital Requisitions Awaiting Approval</span>
+              <span id="walletPendingReqBadge" class="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded font-mono font-bold">0 Pending</span>
+            </span>
+            <span class="text-[11px] text-slate-400">Approval also sent to soumyaranjannanda82@gmail.com</span>
+          </div>
+
+          <div id="walletRequisitionsContainer" class="space-y-3">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. WITHDRAWAL HISTORY LEDGER -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-xl">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="text-lg font-black text-white flex items-center space-x-2">
+              <span>📜</span>
+              <span>Owner Withdrawal History & Receipts</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-1">Audit log of all on-demand payouts disbursed to your personal accounts.</p>
+          </div>
+          <span class="text-xs text-slate-400 mono">Total Disbursed: <strong id="tableTotalDisbursed" class="text-emerald-400">₹0</strong></span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-950 text-slate-400 mono border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4">Withdrawal ID</th>
+                <th class="py-3 px-4">Amount</th>
+                <th class="py-3 px-4">Destination VPA</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4">Timestamp</th>
+                <th class="py-3 px-4 text-right">Receipt</th>
+              </tr>
+            </thead>
+            <tbody id="withdrawalsTableBody" class="divide-y divide-slate-800/60 font-mono">
+              <tr>
+                <td colspan="6" class="py-6 text-center text-slate-500 font-sans">No withdrawals recorded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    let activeOwnerPin = sessionStorage.getItem('owner_wallet_pin') || '';
+
+    // Check lock state on boot
+    if (activeOwnerPin) {
+      verifyAndUnlock(activeOwnerPin);
+    }
+
+    // Auth Form
+    document.getElementById('authForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pin = document.getElementById('authPinInput').value.trim();
+      if (!pin) return;
+
+      const btn = document.getElementById('unlockBtn');
+      btn.disabled = true;
+      btn.innerText = 'Verifying...';
+
+      try {
+        const res = await fetch('/api/wallet/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin })
+        });
+        const d = await res.json();
+        if (d.success) {
+          activeOwnerPin = pin;
+          sessionStorage.setItem('owner_wallet_pin', pin);
+          unlockUi();
+          fetchWalletData();
+          fetchExpansionData();
+        } else {
+          showAuthError(d.error || 'Invalid PIN');
+        }
+      } catch (err) {
+        showAuthError('Connection error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Unlock Digital Wallet</span><span>🔓</span>';
+      }
+    });
+
+    function showAuthError(msg) {
+      const errBox = document.getElementById('authErrorMsg');
+      errBox.innerText = msg;
+      errBox.classList.remove('hidden');
+    }
+
+    function unlockUi() {
+      document.getElementById('lockOverlay').classList.add('hidden');
+      document.getElementById('walletContent').classList.remove('hidden');
+    }
+
+    async function verifyAndUnlock(pin) {
+      try {
+        const res = await fetch('/api/wallet/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin })
+        });
+        const d = await res.json();
+        if (d.success) {
+          unlockUi();
+          fetchWalletData();
+          fetchExpansionData();
+        } else {
+          sessionStorage.removeItem('owner_wallet_pin');
+        }
+      } catch (e) {}
+    }
+
+    // Lock button
+    document.getElementById('lockWalletBtn').addEventListener('click', () => {
+      sessionStorage.removeItem('owner_wallet_pin');
+      activeOwnerPin = '';
+      window.location.reload();
+    });
+
+    // Fetch Wallet Data
+    async function fetchWalletData() {
+      if (!activeOwnerPin) return;
+      try {
+        const res = await fetch(`/api/wallet/status?pin=${encodeURIComponent(activeOwnerPin)}`);
+        const data = await res.json();
+        if (!data.success) return;
+
+        const sheet = data.balanceSheet;
+        const buckets = sheet.buckets;
+
+        // Balances
+        document.getElementById('availableSurplusText').innerText = buckets.availableOwnerSurplus.toLocaleString('en-IN');
+        document.getElementById('maxBtnAmount').innerText = buckets.availableOwnerSurplus;
+        document.getElementById('totalEarnedSurplus').innerText = buckets.totalOwnerSurplus.toLocaleString('en-IN');
+        document.getElementById('totalWithdrawnText').innerText = buckets.totalWithdrawn.toLocaleString('en-IN');
+        document.getElementById('opsReserveText').innerText = buckets.opsReserve.toLocaleString('en-IN');
+        document.getElementById('growthBudgetText').innerText = buckets.growthBudget.toLocaleString('en-IN');
+        document.getElementById('tableTotalDisbursed').innerText = `₹${buckets.totalWithdrawn.toLocaleString('en-IN')}`;
+
+        // Settings prefill
+        if (data.receivingConfig) {
+          document.getElementById('cfgReceivingVpa').value = data.receivingConfig.receivingVpa || '';
+          document.getElementById('cfgReceivingName').value = data.receivingConfig.receivingName || '';
+          if (!document.getElementById('withdrawVpaInput').value) {
+            document.getElementById('withdrawVpaInput').value = data.receivingConfig.receivingVpa || '';
+          }
+        }
+
+        // Render withdrawals table
+        const tbody = document.getElementById('withdrawalsTableBody');
+        tbody.innerHTML = '';
+        if (data.withdrawals.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-500 font-sans">No withdrawals recorded yet.</td></tr>';
+        } else {
+          data.withdrawals.forEach((w) => {
+            tbody.innerHTML += `
+              <tr class="hover:bg-slate-900/60 transition">
+                <td class="py-3 px-4 font-bold text-cyan-400">${w.id}</td>
+                <td class="py-3 px-4 font-bold text-emerald-400">₹${w.amount.toLocaleString('en-IN')}</td>
+                <td class="py-3 px-4 text-slate-300">${w.destination_vpa}</td>
+                <td class="py-3 px-4"><span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] px-2 py-0.5 rounded font-bold uppercase">${w.status}</span></td>
+                <td class="py-3 px-4 text-slate-500">${w.created_at}</td>
+                <td class="py-3 px-4 text-right">
+                  <button onclick="alert('Voucher Ref: ${w.id}\\nAmount: ₹${w.amount}\\nDestination: ${w.destination_vpa}\\nTimestamp: ${w.created_at}\\nStatus: Verified Complete')" class="text-xs text-indigo-400 hover:text-indigo-300 underline font-sans">
+                    View Voucher
+                  </button>
+                </td>
+              </tr>
+            `;
+          });
+        }
+
+      fetchWalletData();
+    }
+
+    // Fetch Expansion Ventures & Capital Requisitions
+    async function fetchExpansionData() {
+      try {
+        const [venturesRes, reqRes] = await Promise.all([
+          fetch('/api/ventures'),
+          fetch('/api/capital/requisitions')
+        ]);
+        const venturesData = await venturesRes.json();
+        const reqData = await reqRes.json();
+
+        // Render Ventures
+        const vGrid = document.getElementById('walletVenturesGrid');
+        if (venturesData.success && venturesData.ventures) {
+          vGrid.innerHTML = '';
+          venturesData.ventures.forEach(v => {
+            vGrid.innerHTML += `
+              <div class="bg-slate-950 border border-slate-800 p-3.5 rounded-2xl flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-white">${v.name}</span>
+                    <span class="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded uppercase">${v.status}</span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 leading-snug">${v.description}</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-900 flex items-center justify-between text-xs mono">
+                  <span class="text-slate-500">Price: <strong class="text-cyan-400">₹${v.pricing_inr}</strong></span>
+                  <span class="text-slate-500">Rev: <strong class="text-emerald-400">₹${v.revenue_generated}</strong></span>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        // Render Requisitions
+        const rContainer = document.getElementById('walletRequisitionsContainer');
+        const rBadge = document.getElementById('walletPendingReqBadge');
+        if (reqData.success && reqData.requisitions) {
+          const pending = reqData.requisitions.filter(r => r.status === 'pending');
+          rBadge.innerText = `${pending.length} Pending`;
+          rContainer.innerHTML = '';
+
+          if (reqData.requisitions.length === 0) {
+            rContainer.innerHTML = '<p class="text-xs text-slate-500 text-center py-3">No expansion capital requisitions submitted yet. Agents operate on zero capital until needed.</p>';
+          } else {
+            reqData.requisitions.forEach(r => {
+              const isPending = r.status === 'pending';
+              rContainer.innerHTML += `
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="space-y-1">
+                    <div class="flex items-center space-x-2">
+                      <span class="text-xs font-bold text-white">${r.venture_name || 'Venture Expansion'}</span>
+                      <span class="text-sm font-black text-emerald-400 mono">₹${r.amount_inr}</span>
+                      <span class="text-[9px] font-bold px-2 py-0.5 rounded uppercase ${
+                        r.status === 'approved' ? 'bg-emerald-500/20 text-emerald-300' :
+                        r.status === 'rejected' ? 'bg-rose-500/20 text-rose-300' :
+                        'bg-amber-500/20 text-amber-300'
+                      }">${r.status}</span>
+                    </div>
+                    <p class="text-xs text-slate-300">${r.reason}</p>
+                    <div class="text-[10px] text-slate-500 mono flex items-center space-x-3">
+                      <span>ROI Projected: <strong class="text-cyan-400">${r.projected_roi || 'N/A'}</strong></span>
+                      <span>•</span>
+                      <span>Requested: ${r.created_at}</span>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center space-x-2 shrink-0">
+                    ${isPending ? `
+                      <button onclick="approveRequisition('${r.id}', '${r.approval_token}')" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition shadow flex items-center space-x-1">
+                        <span>✓</span>
+                        <span>Approve ₹${r.amount_inr}</span>
+                      </button>
+                      <button onclick="rejectRequisition('${r.id}', '${r.approval_token}')" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-bold px-3 py-1.5 rounded-lg text-xs transition">
+                        <span>✕ Reject</span>
+                      </button>
+                    ` : `
+                      <span class="text-xs text-slate-500 mono">Decided: ${r.decided_at || 'Recorded'}</span>
+                    `}
+                  </div>
+                </div>
+              `;
+            });
+          }
+        }
+
+      } catch (err) {
+        console.error('Error loading expansion data:', err);
+      }
+    }
+
+    window.approveRequisition = async function(id, token) {
+      if (!confirm('Approve this capital allocation for business expansion? Funds will be earmarked from growth budget.')) return;
+      try {
+        const res = await fetch(`/api/capital/approve/${id}?token=${encodeURIComponent(token)}`);
+        const d = await res.json();
+        if (d.success) {
+          alert('✓ Capital requisition approved successfully!');
+          fetchExpansionData();
+          fetchWalletData();
+        } else {
+          alert('Approval error: ' + d.error);
+        }
+      } catch (e) {
+        alert('Network error: ' + e.message);
+      }
+    };
+
+    window.rejectRequisition = async function(id, token) {
+      if (!confirm('Reject this capital requisition? The expansion agent will find alternative zero-capital paths.')) return;
+      try {
+        const res = await fetch(`/api/capital/reject/${id}?token=${encodeURIComponent(token)}`);
+        const d = await res.json();
+        if (d.success) {
+          alert('Requisition rejected.');
+          fetchExpansionData();
+        } else {
+          alert('Error: ' + d.error);
+        }
+      } catch (e) {
+        alert('Network error: ' + e.message);
+      }
+    };
+
+    document.getElementById('requestExpansionPulseBtn')?.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/cron/autonomous-pulse?source=wallet_expansion', { method: 'POST' });
+        const d = await res.json();
+        if (d.success) {
+          alert('⚡ Expansion sweep triggered! Portfolio evaluated and opportunities refreshed.');
+          fetchExpansionData();
+        }
+      } catch (e) {
+        alert('Pulse error: ' + e.message);
+      }
+    });
+
+    setInterval(() => {
+      fetchWalletData();
+      fetchExpansionData();
+    }, 5000);
+
+    // Max Button
+    document.getElementById('withdrawMaxBtn').addEventListener('click', () => {
+      const maxVal = document.getElementById('maxBtnAmount').innerText;
+      document.getElementById('withdrawAmountInput').value = maxVal;
+    });
+
+    // Withdrawal Form Submission
+    document.getElementById('withdrawalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const amount = document.getElementById('withdrawAmountInput').value;
+      const destinationVpa = document.getElementById('withdrawVpaInput').value.trim();
+      const ownerPin = document.getElementById('withdrawPinConfirm').value.trim();
+      const note = document.getElementById('withdrawNoteInput').value.trim();
+
+      const feedback = document.getElementById('withdrawFeedback');
+      feedback.className = 'hidden';
+
+      const btn = document.getElementById('executeWithdrawBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span><span>Processing Withdrawal...</span>';
+
+      try {
+        const res = await fetch('/api/wallet/withdraw', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount, destinationVpa, ownerPin, note })
+        });
+        const d = await res.json();
+        if (d.success) {
+          feedback.className = 'text-xs py-2.5 px-3 rounded-xl font-semibold bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 block';
+          feedback.innerText = `✓ Withdrawal Approved! ₹${d.amount} disbursed to ${d.destinationVpa}. Ref: ${d.withdrawalId}`;
+          document.getElementById('withdrawalForm').reset();
+          fetchWalletData();
+        } else {
+          feedback.className = 'text-xs py-2.5 px-3 rounded-xl font-semibold bg-rose-500/20 border border-rose-500/30 text-rose-300 block';
+          feedback.innerText = d.error || 'Withdrawal failed';
+        }
+      } catch (err) {
+        feedback.className = 'text-xs py-2.5 px-3 rounded-xl font-semibold bg-rose-500/20 border border-rose-500/30 text-rose-300 block';
+        feedback.innerText = 'Network error: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Authorize & Withdraw Funds</span><span>⚡</span>';
+      }
+    });
+
+    // Settings Form Submission
+    document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const receivingVpa = document.getElementById('cfgReceivingVpa').value.trim();
+      const receivingName = document.getElementById('cfgReceivingName').value.trim();
+      const newPin = document.getElementById('cfgNewPin').value.trim();
+      const currentPin = document.getElementById('cfgCurrentPin').value.trim();
+
+      const feedback = document.getElementById('settingsFeedback');
+      feedback.className = 'hidden';
+
+      const btn = document.getElementById('saveSettingsBtn');
+      btn.disabled = true;
+      btn.innerText = 'Saving...';
+
+      try {
+        const res = await fetch('/api/wallet/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ receivingVpa, receivingName, newPin, currentPin })
+        });
+        const d = await res.json();
+        if (d.success) {
+          feedback.className = 'text-xs py-2.5 px-3 rounded-xl font-semibold bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 block';
+          feedback.innerText = '✓ Wallet credentials and receiving VPA updated successfully!';
+          if (newPin) {
+            activeOwnerPin = newPin;
+            sessionStorage.setItem('owner_wallet_pin', newPin);
+          }
+          document.getElementById('cfgCurrentPin').value = '';
+          document.getElementById('cfgNewPin').value = '';
+          fetchWalletData();
+        } else {
+          feedback.className = 'text-xs py-2.5 px-3 rounded-xl font-semibold bg-rose-500/20 border border-rose-500/30 text-rose-300 block';
+          feedback.innerText = d.error || 'Update failed';
+        }
+      } catch (err) {
+        feedback.className = 'text-xs py-2.5 px-3 rounded-xl font-semibold bg-rose-500/20 border border-rose-500/30 text-rose-300 block';
+        feedback.innerText = 'Network error: ' + err.message;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Save Wallet Credentials</span><span>💾</span>';
+      }
+    });
+
+    setInterval(fetchWalletData, 5000);
+  </script>
+</body>
+</html>

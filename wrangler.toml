@@ -1,0 +1,6 @@
+name = "auditpulse-os"
+main = "server.js"
+compatibility_date = "2026-10-01"
+
+[site]
+bucket = "./public"

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AuditPulse — Executive Conversion Blueprint</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { 
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #FAF9F6;
+      color: #1E293B;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .gentle-shadow {
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+    }
+    @media print {
+      header, .no-print { display: none !important; }
+      body { background: white !important; color: black !important; }
+      .bg-white { background: white !important; border-color: #cbd5e1 !important; color: black !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-teal-100 selection:text-teal-900">
+
+  <!-- Report Header -->
+  <header class="border-b border-stone-200/80 bg-[#FAF9F6]/90 backdrop-blur-md sticky top-0 z-30 no-print">
+    <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <a href="/" class="flex items-center space-x-2">
+          <div class="w-7 h-7 rounded-lg bg-teal-800 flex items-center justify-center font-bold text-white text-xs">✦</div>
+          <span class="font-extrabold text-lg text-stone-900">Audit<span class="text-teal-700">Pulse</span></span>
+        </a>
+        <span class="text-xs text-stone-300">/</span>
+        <span class="text-xs text-stone-600 font-semibold">Executive Teardown Blueprint</span>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button onclick="window.print()" class="bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold px-4 py-2 rounded-xl border border-stone-800 flex items-center space-x-1.5 transition shadow-sm">
+          <span>📄</span>
+          <span>Save as PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-6 py-10">
+    
+    <!-- Meta & Order Verification -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-stone-200">
+      <div>
+        <div class="flex items-center space-x-2 mb-2">
+          <span class="bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full">
+            ✓ Verified Paid Blueprint
+          </span>
+          <span id="repOrderId" class="text-xs text-stone-600 mono">ORD-XXXXX</span>
+        </div>
+        <h1 id="repDomain" class="text-3xl font-extrabold text-stone-900 tracking-tight mono">loading...</h1>
+        <p id="repUrl" class="text-xs text-stone-600 mt-1">https://...</p>
+      </div>
+      <div class="text-left sm:text-right">
+        <span class="text-[10px] text-stone-600 uppercase font-semibold block">Delivered At</span>
+        <span id="repDate" class="text-xs text-stone-700 mono">2026-10-04</span>
+      </div>
+    </div>
+
+    <!-- Executive Summary Card -->
+    <div class="bg-white border border-stone-200 rounded-3xl p-6 md:p-8 mt-8 gentle-shadow">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-stone-100">
+        <div>
+          <span class="text-xs font-bold text-teal-800 uppercase tracking-wider">Executive Overview</span>
+          <h2 class="text-2xl font-bold text-stone-900 mt-1">Conversion Health Scorecard</h2>
+          <p class="text-xs text-stone-600 mt-1 max-w-xl">
+            This teardown measures friction across 4 critical pillars: page speed, above-the-fold copywriting, mobile layout, and trust signals.
+          </p>
+        </div>
+        <div class="flex items-center space-x-4 bg-stone-50 border border-stone-200 px-6 py-4 rounded-2xl shrink-0">
+          <div>
+            <span class="text-[10px] text-stone-600 uppercase font-bold block">Overall Rating</span>
+            <span id="repScoreStatus" class="text-sm font-bold text-amber-800">Action Recommended</span>
+          </div>
+          <div id="repOverallScore" class="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center justify-center text-2xl font-bold mono">
+            --
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Pillars -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6">
+        <div class="bg-stone-50 border border-stone-100 p-4 rounded-xl">
+          <span class="text-xs text-stone-600 font-semibold block">Performance & Latency</span>
+          <div class="flex items-baseline space-x-2 mt-1">
+            <span id="repSpeed" class="text-xl font-bold text-stone-800 mono">--</span>
+            <span class="text-xs text-stone-600">/ 100</span>
+          </div>
+        </div>
+        <div class="bg-stone-50 border border-stone-100 p-4 rounded-xl">
+          <span class="text-xs text-stone-600 font-semibold block">Headline & Copy</span>
+          <div class="flex items-baseline space-x-2 mt-1">
+            <span id="repCopy" class="text-xl font-bold text-stone-800 mono">--</span>
+            <span class="text-xs text-stone-600">/ 100</span>
+          </div>
+        </div>
+        <div class="bg-stone-50 border border-stone-100 p-4 rounded-xl">
+          <span class="text-xs text-stone-600 font-semibold block">Mobile Layout & CTAs</span>
+          <div class="flex items-baseline space-x-2 mt-1">
+            <span id="repMobile" class="text-xl font-bold text-stone-800 mono">--</span>
+            <span class="text-xs text-stone-600">/ 100</span>
+          </div>
+        </div>
+        <div class="bg-stone-50 border border-stone-100 p-4 rounded-xl">
+          <span class="text-xs text-stone-600 font-semibold block">Trust & Risk Reversal</span>
+          <div class="flex items-baseline space-x-2 mt-1">
+            <span id="repTrust" class="text-xl font-bold text-stone-800 mono">--</span>
+            <span class="text-xs text-stone-600">/ 100</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Plug-and-Play Headline Rewrites -->
+    <div class="mt-8 bg-white border border-stone-200 rounded-3xl p-6 md:p-8 gentle-shadow">
+      <div class="flex items-center space-x-3 mb-6">
+        <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-800 border border-teal-200 flex items-center justify-center font-bold text-xs">1</div>
+        <div>
+          <h3 class="text-lg font-bold text-stone-900">Above-The-Fold Copywriting Overhaul</h3>
+          <p class="text-xs text-stone-600">Replace feature-heavy headlines with these tailored benefit hooks.</p>
+        </div>
+      </div>
+
+      <div id="headlinesContainer" class="space-y-3">
+        <!-- Injected -->
+      </div>
+    </div>
+
+    <!-- Section 2: 50-Point Ranked Action Roadmap -->
+    <div class="mt-8 bg-white border border-stone-200 rounded-3xl p-6 md:p-8 gentle-shadow">
+      <div class="flex items-center space-x-3 mb-6">
+        <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-800 border border-teal-200 flex items-center justify-center font-bold text-xs">2</div>
+        <div>
+          <h3 class="text-lg font-bold text-stone-900">Ranked Developer & Marketing Action Checklist</h3>
+          <p class="text-xs text-stone-600">Execute in order of expected conversion lift.</p>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        <div class="bg-stone-50 border border-stone-200 p-5 rounded-2xl">
+          <div class="flex items-center justify-between mb-3 border-b border-stone-200 pb-2">
+            <span class="text-xs font-bold text-stone-900 uppercase tracking-wider">Phase 1: Quick Wins (< 60 Minutes)</span>
+            <span class="text-[10px] text-emerald-800 font-semibold">Estimated Lift: +10% to +18%</span>
+          </div>
+          <div id="phase1Tasks" class="space-y-2.5"></div>
+        </div>
+
+        <div class="bg-stone-50 border border-stone-200 p-5 rounded-2xl">
+          <div class="flex items-center justify-between mb-3 border-b border-stone-200 pb-2">
+            <span class="text-xs font-bold text-stone-900 uppercase tracking-wider">Phase 2: High-Impact Upgrades (< 24 Hours)</span>
+            <span class="text-[10px] text-emerald-800 font-semibold">Estimated Lift: +15% to +25%</span>
+          </div>
+          <div id="phase2Tasks" class="space-y-2.5"></div>
+        </div>
+
+        <div class="bg-stone-50 border border-stone-200 p-5 rounded-2xl">
+          <div class="flex items-center justify-between mb-3 border-b border-stone-200 pb-2">
+            <span class="text-xs font-bold text-stone-900 uppercase tracking-wider">Phase 3: Strategic Multipliers</span>
+            <span class="text-[10px] text-emerald-800 font-semibold">Estimated Lift: +20% to +35%</span>
+          </div>
+          <div id="phase3Tasks" class="space-y-2.5"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    const orderId = window.location.pathname.split('/').pop();
+    
+    async function loadReport() {
+      try {
+        const res = await fetch(`/api/report/${orderId}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Report not found');
+
+        const order = data.order;
+        const scan = data.scan;
+        const full = data.fullReport;
+
+        document.getElementById('repOrderId').innerText = order.id;
+        document.getElementById('repDomain').innerText = order.target_url.replace(/https?:\/\//, '').split('/')[0];
+        document.getElementById('repUrl').innerText = order.target_url;
+        document.getElementById('repDate').innerText = (order.paid_at || order.created_at).split(' ')[0];
+
+        document.getElementById('repOverallScore').innerText = scan.health_score;
+        document.getElementById('repSpeed').innerText = scan.speed_score;
+        document.getElementById('repCopy').innerText = scan.copy_score;
+        document.getElementById('repMobile').innerText = scan.mobile_score;
+        document.getElementById('repTrust').innerText = scan.trust_score;
+
+        if (scan.health_score >= 75) {
+          document.getElementById('repScoreStatus').innerText = 'Well Optimized';
+          document.getElementById('repScoreStatus').className = 'text-sm font-bold text-emerald-800';
+          document.getElementById('repOverallScore').className = 'w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-center text-2xl font-bold mono';
+        }
+
+        // Render Headings
+        const headlinesBox = document.getElementById('headlinesContainer');
+        headlinesBox.innerHTML = '';
+        full.headlineRewrites.forEach((hl, i) => {
+          headlinesBox.innerHTML += `
+            <div class="bg-stone-50 border border-stone-200 p-4 rounded-xl flex items-start space-x-3">
+              <span class="text-xs font-bold text-teal-800 mono">Option ${i + 1}:</span>
+              <p class="text-sm font-semibold text-stone-900">"${hl}"</p>
+            </div>
+          `;
+        });
+
+        // Render Tasks
+        const renderTasks = (containerId, tasks) => {
+          const box = document.getElementById(containerId);
+          box.innerHTML = '';
+          tasks.forEach((t) => {
+            box.innerHTML += `
+              <label class="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-stone-100 cursor-pointer transition">
+                <input type="checkbox" class="mt-1 rounded border-stone-300 text-teal-800 focus:ring-0">
+                <div class="flex-grow">
+                  <span class="text-xs text-stone-700">${t.task}</span>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="text-[10px] text-teal-800 font-bold block">${t.impact}</span>
+                  <span class="text-[9px] text-stone-600 mono">${t.time}</span>
+                </div>
+              </label>
+            `;
+          });
+        };
+
+        renderTasks('phase1Tasks', full.actionRoadmap.phase1);
+        renderTasks('phase2Tasks', full.actionRoadmap.phase2);
+        renderTasks('phase3Tasks', full.actionRoadmap.phase3);
+
+      } catch (e) {
+        alert('Failed to load report: ' + e.message);
+      }
+    }
+
+    loadReport();
+  </script>
+</body>
+</html>
